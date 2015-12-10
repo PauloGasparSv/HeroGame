@@ -3,6 +3,7 @@ package paulogaspar.hero.actors;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.controllers.Controller;
 import com.badlogic.gdx.controllers.PovDirection;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
@@ -13,18 +14,20 @@ import com.badlogic.gdx.math.Rectangle;
 import paulogaspar.hero.maps.Platform;
 
 public class King extends Actor {
-	public final int IDLE = 0, WALK = 1,JUMPING = 2;
+	public final int IDLE = 0, WALK = 1,JUMPING = 2,CLIMBING = 3;
 	
 	//PRIMITIVES AND ARRAYS	
 	public boolean grounded;
 	private boolean pressing_jump;
+	public boolean pressing_climb;
 	
 	public int state;
 	public int sub_state;
 	
 	private float move_delta;
+	private float climb_delta;
 	private float scale_y;
-	private float []speed;
+	public float []speed;
 	
 	private long land_timer;
 	private long pressing_timer;
@@ -35,6 +38,7 @@ public class King extends Actor {
 	//OBJETCTS
 	private Animation walk_animation;
 	private Animation run_animation;
+	private Animation climb_animation;
 	
 	private TextureRegion idle_region;
 	private TextureRegion current_region;
@@ -68,6 +72,14 @@ public class King extends Actor {
 		}
 		run_animation = new Animation(0.11f,run_region);
 		
+		//CREATING CLIMB ANIMATION
+		TextureRegion[]climb_region = new TextureRegion[4];
+		for(int i = 0; i < 4; i++){
+			climb_region[i] = new TextureRegion(sheet,(i+18)*32,32,32,32);
+		}
+		climb_animation = new Animation(0.1f,climb_region);
+		
+		
 		idle_region = new TextureRegion(sheet,0,32,32,32);
 		current_region = idle_region;
 		
@@ -98,6 +110,7 @@ public class King extends Actor {
 		land_timer = 0;
 		pressing_timer = 0;
 		scale_y = 1;
+		climb_delta = 0;
 	}
 	
 	@Override
@@ -128,8 +141,8 @@ public class King extends Actor {
 			}
 			
 			if(sub_state == 0){
-				if(System.currentTimeMillis() - pressing_timer > 1000 && System.currentTimeMillis() - pressing_timer < 3200){
-					scale_y -= delta*0.09f;
+				if(System.currentTimeMillis() - pressing_timer > 800 && System.currentTimeMillis() - pressing_timer < 1800){
+					scale_y -= delta*0.1f;
 					if(scale_y < 0.5f)scale_y = 0.5f;
 				}
 			}
@@ -138,7 +151,17 @@ public class King extends Actor {
 			if(sub_state == 0 && speed[1] > 0)sub_state = 1;
 			if(sub_state == 1 && speed[1] < 0)sub_state = 2;
 		}
-		
+		else if(state == CLIMBING){
+			if(speed[1] > 0){
+				position[1] += 140*delta;
+				climb_delta += delta;
+			}
+			else if(speed[1] < 0){
+				position[1] -= 140*delta;
+				climb_delta -= delta;
+				if(climb_delta < 0)climb_delta += 6000;
+			}
+		}
 		
 		if(!grounded){
 			speed[1] -= delta * 10f;
@@ -164,6 +187,10 @@ public class King extends Actor {
 	
 	public void checkPlatform(Platform [] platforms,float delta){
 		boolean g = false;
+		if(state == CLIMBING){
+			grounded = true;
+			return;
+		}
 		for(Platform p:platforms){
 			if(p.active && rect().overlaps(p.rect)){
 				if(position[0]+ 32 - speed[0]*delta < p.rect.x && facing_right){
@@ -227,7 +254,21 @@ public class King extends Actor {
 			speed[0] = 0;
 		}
 		
-		if(gamepad.getButton(2) && grounded){
+		if(direction == PovDirection.north){
+			pressing_climb = true;
+		}
+		if(direction == PovDirection.north && state == CLIMBING){
+			speed[1] = 1;
+		}
+		else if(direction == PovDirection.south && state == CLIMBING){
+			speed[1] = -1;
+		}
+		else if(state == CLIMBING) speed[1] = 0;
+		
+		
+		if(pressing_climb && direction != PovDirection.north)pressing_climb = false;
+		
+		if(gamepad.getButton(2) && grounded && state < JUMPING){
 			if(!pressing_jump){
 				speed[0] = 0;
 				pressing_timer = System.currentTimeMillis();
@@ -240,7 +281,7 @@ public class King extends Actor {
 			pressing_jump = false;
 			state = JUMPING;
 			sub_state = 1;
-			if(System.currentTimeMillis() - pressing_timer < 3200)speed[1] = 5;
+			if(System.currentTimeMillis() - pressing_timer < 1800)speed[1] = 5;
 			else speed[1] = 10;
 			pressing_timer = 0;
 			grounded = false;
@@ -269,10 +310,13 @@ public class King extends Actor {
 			else if(sub_state == 2)current_region = jump_down;
 			else if(sub_state == 3)current_region = jump_land;
 		}
+		else if(state == CLIMBING) current_region = climb_animation.getKeyFrame(climb_delta,true);
 		
 		if(current_region.isFlipX() == facing_right)current_region.flip(true, false);
 		
+		if(state == JUMPING)batch.setColor(1,1-2f*(1-scale_y),1-2f*(1-scale_y),1);
 		batch.draw(current_region,position[0],position[1],16,0,32,32,3,3*scale_y,0);
+		batch.setColor(Color.WHITE);
 	}
 	
 	

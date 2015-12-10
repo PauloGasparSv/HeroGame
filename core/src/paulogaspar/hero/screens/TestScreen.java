@@ -7,10 +7,13 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
 import paulogaspar.hero.actors.King;
+import paulogaspar.hero.maps.BackgroundElement;
 import paulogaspar.hero.maps.Ground;
+import paulogaspar.hero.maps.Ladder;
 import paulogaspar.hero.maps.Platform;
 
 public class TestScreen extends Stage implements Screen{
@@ -20,6 +23,9 @@ public class TestScreen extends Stage implements Screen{
 	private Texture tileset;
 	
 	private Platform[] platforms;
+	private BackgroundElement[]bg_elements;
+	
+	private Ladder[] ladders;
 	
 	ShapeRenderer s;
 	
@@ -35,15 +41,20 @@ public class TestScreen extends Stage implements Screen{
 		
 		tileset = new Texture(Gdx.files.internal("sheet.png"));
 		
-		platforms = new Platform[2];
-		platforms[0] = new Ground(tileset,-120, 100,16,1);
-		platforms[1] = new Ground(tileset,-40, 164,14,1);
+		platforms = new Platform[1];
+		platforms[0] = new Ground(tileset,-120, 0,16,2);
+		
+		ladders = new Ladder[1];
+		ladders[0] = new Ladder(tileset, 380, 128, 3);
+		
+		bg_elements = new BackgroundElement[1];
+		bg_elements[0] = new BackgroundElement(new TextureRegion(tileset,0,0,112,128), 64, 128, 3.84f);
 
 		initController();			
 
 		king = new King(gamepad,camera);
 		king.position[0] = 300;
-		king.position[1] = 600;
+		king.position[1] = 300;
 		
 		s = new ShapeRenderer();
 		
@@ -62,6 +73,8 @@ public class TestScreen extends Stage implements Screen{
 		king.update(delta);
 		
 		for(Platform p:platforms)p.update(delta, camera);
+		for(BackgroundElement e:bg_elements)e.update(camera);
+		for(Ladder l:ladders)l.update(camera, king);
 		
 		if(Gdx.input.isKeyPressed(Input.Keys.LEFT))camera.translate(-300*delta, 0);
 		if(Gdx.input.isKeyPressed(Input.Keys.RIGHT))camera.translate(300*delta, 0);
@@ -75,9 +88,14 @@ public class TestScreen extends Stage implements Screen{
 	public void draw(){
 		batch.setProjectionMatrix(camera.combined);
 		batch.begin();
+
+		for(BackgroundElement e:bg_elements)e.draw(batch);
+		
+		for(Platform p:platforms)p.draw(batch);
+		for(Ladder l:ladders)l.draw(batch);
 		
 		king.draw(batch);
-		for(Platform p:platforms)p.draw(batch);
+		
 
 		
 		batch.end();
@@ -110,8 +128,10 @@ public class TestScreen extends Stage implements Screen{
 
 	@Override
 	public void render(float delta) {
-		Gdx.gl.glClearColor(0.72f, 0.88f, 0.8f, 1);
+		Gdx.gl.glClearColor(0.6f, 0.64f, 0.41f, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+		Gdx.graphics.setTitle("Hero FPS: "+Gdx.graphics.getFramesPerSecond());
+
 		update(delta);
 		if(!next_stage)draw();
 	}
