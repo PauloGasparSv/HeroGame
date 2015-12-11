@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Vector2;
 
 import paulogaspar.hero.actors.King;
 import paulogaspar.hero.maps.BackgroundElement;
@@ -41,14 +42,16 @@ public class TestScreen extends Stage implements Screen{
 		
 		tileset = new Texture(Gdx.files.internal("sheet.png"));
 		
-		platforms = new Platform[1];
+		platforms = new Platform[3];
 		platforms[0] = new Ground(tileset,-120, 0,16,2);
+		platforms[1] = new Ground(tileset,120,240,2,1);
+		platforms[2] = new Ground(tileset,1020, 0,16,2);
 		
 		ladders = new Ladder[1];
-		ladders[0] = new Ladder(tileset, 380, 128, 3);
+		ladders[0] = new Ladder(tileset, 380, 128, 10);
 		
 		bg_elements = new BackgroundElement[1];
-		bg_elements[0] = new BackgroundElement(new TextureRegion(tileset,0,0,112,128), 64, 128, 3.84f);
+		bg_elements[0] = new BackgroundElement(new TextureRegion(tileset,0,0,112,128), 64, 128, 4.2f);
 
 		initController();			
 
@@ -71,6 +74,30 @@ public class TestScreen extends Stage implements Screen{
 		
 		king.checkPlatform(platforms,delta);
 		king.update(delta);
+		
+		Vector2 translation = new Vector2(0,0);
+		if(king.position[0] < camera.position.x -130){
+			translation.x = -king.speed[0] * delta;
+		}
+		else if(king.position[0] > camera.position.x + 120){
+			translation.x = king.speed[0] * delta;
+		}
+		if(king.position[1] > camera.position.y ){
+			if(king.state == king.CLIMBING)translation.y = 140* delta;
+			else translation.y = king.speed[1]*delta*40;
+
+		}
+		else if(king.position[1] < camera.position.y -200){
+ 			if(king.state == king.CLIMBING)translation.y =-140* delta;
+			else translation.y = king.speed[1]*delta*40;
+		}
+		if(camera.position.x - 400 + translation.x < 0)translation.x = 0;
+		if(camera.position.x - 400 + translation.x > 680)translation.x = 0;
+		if(camera.position.y - 300 + translation.y < 0)translation.y = 0;
+		if(camera.position.y - 300 + translation.y > 580)translation.y = 0;
+		
+		camera.translate(translation);
+		
 		
 		for(Platform p:platforms)p.update(delta, camera);
 		for(BackgroundElement e:bg_elements)e.update(camera);

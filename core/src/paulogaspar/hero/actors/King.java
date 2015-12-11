@@ -14,7 +14,7 @@ import com.badlogic.gdx.math.Rectangle;
 import paulogaspar.hero.maps.Platform;
 
 public class King extends Actor {
-	public final int IDLE = 0, WALK = 1,JUMPING = 2,CLIMBING = 3;
+	public final int IDLE = 0, WALK = 1,JUMPING = 2,CLIMBING = 3, ATTACKING = 4;
 	
 	//PRIMITIVES AND ARRAYS	
 	public boolean grounded;
@@ -115,16 +115,25 @@ public class King extends Actor {
 	
 	@Override
 	public void update(float delta){
-				
 		if(gamepad != null)gamepadControl();
 		else keyboardControl();
 		
 		if(state == IDLE){
 			move_delta  = 0;
 			speed[0] = 0;
+			
+			if(speed[1] < 0){
+				state = JUMPING;
+				sub_state = 1;
+			}
+			
 		}
 		else if(state == WALK){
-			move_delta += delta;			
+			move_delta += delta;	
+			if(speed[1] < 0){
+				state = JUMPING;
+				sub_state = 1;
+			}
 		}
 		else if(state == JUMPING){
 			if(sub_state != 0 && sub_state != 3 && grounded){
@@ -166,22 +175,17 @@ public class King extends Actor {
 		if(!grounded){
 			speed[1] -= delta * 10f;
 			if(speed[1] < -8)speed[1] = -8;
-			position[1] += speed[1];
+			position[1] += speed[1]*delta*40f;
 		}
 		else{
 			speed[1] = 0;
 		}
-	
+		
 			
 		if(facing_right)position[0] += delta * speed[0];
 		else position[0] -= delta * speed[0];
-	
-		if(position[0] < camera.position.x -200){
-			camera.translate(-speed[0] * delta,0);
-		}
-		else if(position[0] > camera.position.x + 200){
-			camera.translate(speed[0] * delta,0);
-		}
+		if(position[0] < 0)position[0] = 0;
+		
 				
 	}
 	
@@ -189,6 +193,7 @@ public class King extends Actor {
 		boolean g = false;
 		if(state == CLIMBING){
 			grounded = true;
+			speed[1] = 0;
 			return;
 		}
 		for(Platform p:platforms){
@@ -202,8 +207,7 @@ public class King extends Actor {
 					speed[0] = 1;
 				}
 				else{
-					if(p.rect.x == -40 && speed[0] != 0)System.out.println("X: "+(position[0] + 36 - speed[0] * delta) + " PX: "+p.rect.x);
-					position[1] = p.rect.y + p.rect.height;
+					position[1] = p.rect.y + p.rect.height-2;
 					g = true;
 				}
 			}
@@ -220,6 +224,7 @@ public class King extends Actor {
 	private void gamepadControl(){
 		PovDirection direction = gamepad.getPov(0);
 		float axis = gamepad.getAxis(0);
+		float axisv = gamepad.getAxis(1);
 		
 		if(direction == PovDirection.west || direction == PovDirection.northWest || direction == PovDirection.southWest ||
 				axis < -0.2f){
@@ -253,20 +258,19 @@ public class King extends Actor {
 			 if(state < JUMPING)state = IDLE;
 			speed[0] = 0;
 		}
-		
-		if(direction == PovDirection.north){
+		if(direction == PovDirection.north || axisv < -0.4f){
 			pressing_climb = true;
 		}
-		if(direction == PovDirection.north && state == CLIMBING){
+		if((direction == PovDirection.north || axisv < -0.4f) && state == CLIMBING){
 			speed[1] = 1;
 		}
-		else if(direction == PovDirection.south && state == CLIMBING){
+		else if((direction == PovDirection.south || axisv > 0.4f)&& state == CLIMBING){
 			speed[1] = -1;
 		}
 		else if(state == CLIMBING) speed[1] = 0;
 		
 		
-		if(pressing_climb && direction != PovDirection.north)pressing_climb = false;
+		if(pressing_climb && (direction != PovDirection.north && axisv >-0.4f))pressing_climb = false;
 		
 		if(gamepad.getButton(2) && grounded && state < JUMPING){
 			if(!pressing_jump){

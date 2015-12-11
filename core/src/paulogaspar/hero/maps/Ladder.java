@@ -37,17 +37,18 @@ public class Ladder {
 		else active = false;
 		
 		if(active){
-			if(player.pressing_climb && rect().overlaps(player.rect()) && !holding_player && player.position[1] > rect.y - 20){
+			if(player.pressing_climb && rect().overlaps(player.rect()) && !holding_player && player.position[1] > rect.y - 24){
+				System.out.println("WOOOFW");
 				player.state = player.CLIMBING;
 				player.sub_state = 0;
 				holding_player = true;
 			}
-			if(player.state == player.CLIMBING && holding_player && (!rect().overlaps(player.rect()) ||  player.position[1] < rect.y )){
+			else if(player.state == player.CLIMBING && holding_player && (!rect().overlaps(player.rect()) ||  player.position[1] < rect.y )){
 				player.state = player.IDLE;
 				holding_player = false;
 				if(player.position[1] > rect().y + rect().height - 8){
 					player.position[1] += 10;
-					player.speed[1] = 5;
+					player.speed[1] = 4;
 				}
 			}
 			
