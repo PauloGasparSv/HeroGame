@@ -1,7 +1,5 @@
 package paulogaspar.hero.maps;
 
-import org.w3c.dom.css.Rect;
-
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -37,19 +35,19 @@ public class Ladder {
 		else active = false;
 		
 		if(active){
-			if(player.pressing_climb && rect().overlaps(player.rect()) && !holding_player && player.position[1] > rect.y - 24){
-				System.out.println("WOOOFW");
-				player.state = player.CLIMBING;
-				player.sub_state = 0;
-				holding_player = true;
-			}
-			else if(player.state == player.CLIMBING && holding_player && (!rect().overlaps(player.rect()) ||  player.position[1] < rect.y )){
+			if(player.state == player.CLIMBING && holding_player && (!rect().overlaps(player.rect()) ||  player.position[1] < rect.y )){
 				player.state = player.IDLE;
 				holding_player = false;
+				player.wanna_climb = false;
 				if(player.position[1] > rect().y + rect().height - 8){
 					player.position[1] += 10;
 					player.speed[1] = 4;
 				}
+			}
+			else if(player.wanna_climb && rect().overlaps(player.rect()) && !holding_player && player.position[1] > rect.y - 24){
+				player.state = player.CLIMBING;
+				player.sub_state = 0;
+				holding_player = true;
 			}
 			
 			

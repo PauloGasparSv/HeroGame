@@ -11,11 +11,15 @@ public class Ground extends Platform{
 	TextureRegion[] tiles;
 	private int[] number_of_tiles;
 	
+	private int [][]map;
 	
-	public Ground(Texture sheet,int x,int y,int w,int h){
+	
+	public Ground(Texture sheet,int x,int y,int w,int h,int type,String style){
 		rect = new Rectangle(x,y,w*64,h*64);
 		active = false;
 			
+		this.type = type;
+		
 		number_of_tiles = new int[2];
 		number_of_tiles[0] = w;
 		number_of_tiles[1] = h;
@@ -27,6 +31,28 @@ public class Ground extends Platform{
 		tiles[3] = new TextureRegion(sheet,112+32,16,16,16);
 		tiles[4] = new TextureRegion(sheet,112+48,16,16,16);
 		tiles[5] = new TextureRegion(sheet,112+80,16,16,16);
+		
+		if(style == null){
+			map = new int [number_of_tiles[1]][number_of_tiles[0]];
+			
+			map[0][0] = 2;
+			map[0][map[0].length-1] = 3;
+			
+			for(int i = 1; i < map[0].length-1;i++){
+				map[0][i] = 0;
+			}
+			for(int i = 1; i < map.length; i++){
+				map[i][0] = 4;
+				map[i][map[0].length-1] = 5;
+			}
+			
+			for(int i = 1; i < map.length; i++){
+				for(int j = 1; j < map[0].length-1; j++){
+					map[i][j] = 1;
+				}
+			}
+			
+		}
 		
 	}
 	
@@ -45,19 +71,14 @@ public class Ground extends Platform{
 	public void draw(SpriteBatch batch){
 		if(!active)return;
 		
-		batch.draw(tiles[2],rect.x,rect.y + 64*(number_of_tiles[1]-1),0,0,16,16,4,4,0);
-		batch.draw(tiles[3],rect.x+number_of_tiles[0]*64-64,rect.y + 64*(number_of_tiles[1]-1),0,0,16,16,4,4,0);
-		
-		for(int i = 1; i < number_of_tiles[1]; i++){
-			batch.draw(tiles[4],rect.x,rect.y-64*(i-1),0,0,16,16,4,4,0);
-			batch.draw(tiles[5],rect.x+number_of_tiles[0]*64-64,rect.y-64*(i-1),0,0,16,16,4,4,0);
+		for(int l = map.length-1; l >-1; l--){
+			for(int c = 0; c < map[0].length; c++){
+				batch.draw(tiles[map[l][c]],rect.x+c*64,rect.y+64*(map.length-l-1),0,0,16,16,4,4,0);
+			}
 		}
+				
+	
 		
-		for(int i = 1; i < number_of_tiles[0]-1; i++)
-			batch.draw(tiles[0],rect.x+64*i,rect.y+64*(number_of_tiles[1]-1),0,0,16,16,4,4,0);
-		for(int i = 1; i < number_of_tiles[1]; i++)
-			for(int j = 1; j < number_of_tiles[0]-1; j++)
-				batch.draw(tiles[1],rect.x+64*j,rect.y-64*(i-1),0,0,16,16,4,4,0);
 	}
 	
 	

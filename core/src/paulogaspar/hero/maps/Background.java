@@ -4,23 +4,29 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
-public class BackgroundElement {
+public class Background{
 	
-	protected TextureRegion region;
-	protected int[]position;
-	protected int width;
-	protected int height;
+	private TextureRegion region;
+	private float[]position;
+	private float [] initial_position;
+	private int width;
+	private int height;
 	public boolean active;
-	protected float scale;
+	private float scale;
+	private float speed;
 	
-	public BackgroundElement(TextureRegion region,int x,int y,float scale){
+	public Background(TextureRegion region,int x,int y,float scale,float speed){
 		this.region = region;
-		position = new int[2];
+		position = new float[2];
 		position[0] = x;
 		position[1] = y;
+		initial_position = new float[2];
+		initial_position[0] = x;
+		initial_position[1] = y;
 		width = region.getRegionWidth();
 		height = region.getRegionHeight();
 		active = false;
+		this.speed = speed;
 		this.scale = scale;
 	}
 	
@@ -28,6 +34,7 @@ public class BackgroundElement {
 		if(position[0] +width*scale> camera.position.x - camera.viewportWidth/2 && position[0] < camera.position.x + camera.viewportWidth/2 && 
 				position[1] > camera.position.y - height*scale- camera.viewportHeight/2 && position[1] < camera.position.y + camera.viewportHeight/2)active = true;
 		else active = false;
+		if(speed!=1)position[0] = initial_position[0] + camera.position.x/speed - 400;
 	}
 	
 	public void draw(SpriteBatch batch){

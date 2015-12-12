@@ -12,7 +12,9 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 
 import paulogaspar.hero.actors.King;
+import paulogaspar.hero.maps.Background;
 import paulogaspar.hero.maps.BackgroundElement;
+import paulogaspar.hero.maps.BackgroundMoss;
 import paulogaspar.hero.maps.Ground;
 import paulogaspar.hero.maps.Ladder;
 import paulogaspar.hero.maps.Platform;
@@ -25,6 +27,7 @@ public class TestScreen extends Stage implements Screen{
 	
 	private Platform[] platforms;
 	private BackgroundElement[]bg_elements;
+	private Background [] bg;
 	
 	private Ladder[] ladders;
 	
@@ -43,16 +46,39 @@ public class TestScreen extends Stage implements Screen{
 		tileset = new Texture(Gdx.files.internal("sheet.png"));
 		
 		platforms = new Platform[3];
-		platforms[0] = new Ground(tileset,-120, 0,16,2);
-		platforms[1] = new Ground(tileset,120,240,2,1);
-		platforms[2] = new Ground(tileset,1020, 0,16,2);
+		platforms[0] = new Ground(tileset,-120, -64,16,3,0,null);
+		platforms[1] = new Ground(tileset,120,128,2,3,1,null);
+		platforms[2] = new Ground(tileset,1020, -64,16,3,0,null);
 		
 		ladders = new Ladder[1];
-		ladders[0] = new Ladder(tileset, 380, 128, 10);
+		ladders[0] = new Ladder(tileset, 180, 126, 4);
+		
+		bg = new Background[1];
+		bg[0] = new Background(new TextureRegion(tileset,0,0,112,128), 64, 128, 4.2f,1);
+
 		
 		bg_elements = new BackgroundElement[1];
-		bg_elements[0] = new BackgroundElement(new TextureRegion(tileset,0,0,112,128), 64, 128, 4.2f);
-
+		//bg_elements[0] = 
+		TextureRegion [] moss = new TextureRegion[15];
+		moss[0] = new TextureRegion(tileset,112+16*4,16*4,16,16);
+		moss[1] = new TextureRegion(tileset,112+16*5,16*4,16,16);
+		moss[2] = new TextureRegion(tileset,112+16*6,16*4,16,16);
+		moss[3] = new TextureRegion(tileset,112+16*4,16*5,16,16);
+		moss[4] = new TextureRegion(tileset,112+16*5,16*5,16,16);
+		moss[5] = new TextureRegion(tileset,112+16*6,16*5,16,16);
+		moss[6] = new TextureRegion(tileset,112+16*4,16*6,16,16);
+		moss[7] = new TextureRegion(tileset,112+16*5,16*6,16,16);
+		moss[8] = new TextureRegion(tileset,112+16*6,16*6,16,16);
+		moss[9] = new TextureRegion(tileset,112+16*2,16*4,16,16);
+		moss[10] = new TextureRegion(tileset,112+16*3,16*4,16,16);
+		moss[11] = new TextureRegion(tileset,112+16*2,16*5,16,16);
+		moss[12] = new TextureRegion(tileset,112+16*3,16*5,16,16);
+		moss[13] = new TextureRegion(tileset,112+16*2,16*6,16,16);
+		moss[14] = new TextureRegion(tileset,112+16*3,16*6,16,16);
+		
+	
+		bg_elements[0] = new BackgroundMoss(moss, 502, 10, 4, "-1,-1,0,1,1,2,#,-1,-1,3,14,14,5,#,-1,-1,3,4,4,5,#,0,1,12,4,13,5,#,3,4,14,4,4,5,#,6,7,7,7,7,8,#");		
+		
 		initController();			
 
 		king = new King(gamepad,camera);
@@ -98,7 +124,7 @@ public class TestScreen extends Stage implements Screen{
 		
 		camera.translate(translation);
 		
-		
+		for(Background b:bg)b.update(camera);
 		for(Platform p:platforms)p.update(delta, camera);
 		for(BackgroundElement e:bg_elements)e.update(camera);
 		for(Ladder l:ladders)l.update(camera, king);
@@ -116,6 +142,7 @@ public class TestScreen extends Stage implements Screen{
 		batch.setProjectionMatrix(camera.combined);
 		batch.begin();
 
+		for(Background b:bg)b.draw(batch);
 		for(BackgroundElement e:bg_elements)e.draw(batch);
 		
 		for(Platform p:platforms)p.draw(batch);

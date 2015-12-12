@@ -19,7 +19,8 @@ public class King extends Actor {
 	//PRIMITIVES AND ARRAYS	
 	public boolean grounded;
 	private boolean pressing_jump;
-	public boolean pressing_climb;
+	public boolean wanna_climb;
+	private boolean pressing_climb;
 	
 	public int state;
 	public int sub_state;
@@ -48,14 +49,14 @@ public class King extends Actor {
 	private TextureRegion jump_land;
 	
 	
-	private OrthographicCamera camera;
+	//private OrthographicCamera camera;
 	
 	private Controller gamepad;
 	
 	public King(Controller gamepad,OrthographicCamera camera){
 		sheet = new Texture(Gdx.files.internal("characters.png"));
 		
-		this.camera = camera;
+		//this.camera = camera;
 		
 		//CREATING WALKING ANIMATION
 		TextureRegion[] walk_region = new TextureRegion[4];
@@ -111,6 +112,8 @@ public class King extends Actor {
 		pressing_timer = 0;
 		scale_y = 1;
 		climb_delta = 0;
+		wanna_climb = false;
+		pressing_climb = false;
 	}
 	
 	@Override
@@ -193,20 +196,20 @@ public class King extends Actor {
 		boolean g = false;
 		if(state == CLIMBING){
 			grounded = true;
-			speed[1] = 0;
+			//speed[1] = 0;
 			return;
 		}
 		for(Platform p:platforms){
 			if(p.active && rect().overlaps(p.rect)){
-				if(position[0]+ 32 - speed[0]*delta < p.rect.x && facing_right){
+				if(position[0]+ 32 - speed[0]*delta < p.rect.x && facing_right && p.type == 0){
 					position[0] = p.rect.x - 36;
 					speed[0] = -1;
 				}
-				else if(position[0] + 4 + speed[0]*delta > p.rect.x + p.rect.width && !facing_right){
+				else if(position[0] + 4 + speed[0]*delta > p.rect.x + p.rect.width && !facing_right&& p.type == 0){
 					position[0] = p.rect.x + p.rect.width;
 					speed[0] = 1;
 				}
-				else{
+				else if(speed[1] <= 0 && position[1]+12 > p.rect.y + p.rect.height){
 					position[1] = p.rect.y + p.rect.height-2;
 					g = true;
 				}
@@ -258,8 +261,13 @@ public class King extends Actor {
 			 if(state < JUMPING)state = IDLE;
 			speed[0] = 0;
 		}
-		if(direction == PovDirection.north || axisv < -0.4f){
-			pressing_climb = true;
+		System.out.println(wanna_climb);
+		
+		if(direction == PovDirection.north || direction == PovDirection.south  || axisv < -0.4f){
+			if(!pressing_climb){
+				wanna_climb = true;
+				pressing_climb = true;
+			}
 		}
 		if((direction == PovDirection.north || axisv < -0.4f) && state == CLIMBING){
 			speed[1] = 1;
@@ -270,7 +278,10 @@ public class King extends Actor {
 		else if(state == CLIMBING) speed[1] = 0;
 		
 		
-		if(pressing_climb && (direction != PovDirection.north && axisv >-0.4f))pressing_climb = false;
+		if((direction != PovDirection.north && axisv >-0.4f && direction != PovDirection.south)){
+			wanna_climb = false;
+			pressing_climb = false;
+		}
 		
 		if(gamepad.getButton(2) && grounded && state < JUMPING){
 			if(!pressing_jump){
