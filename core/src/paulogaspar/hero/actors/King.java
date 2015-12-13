@@ -275,6 +275,12 @@ public class King extends Actor {
 		if(facing_right)return new Rectangle(position[0]-2,position[1],38,64);
 		else return new Rectangle(position[0]-4,position[1],38,64);
 	}
+	
+	public Rectangle atkRect(){
+		if(facing_right)return new Rectangle(slash_position[0]-2,position[1],50,64);
+		else return new Rectangle(slash_position[0]-16,position[1],50,64);
+	}
+	
 		
 	private void gamepadControl(){
 		PovDirection direction = gamepad.getPov(0);
@@ -420,6 +426,13 @@ public class King extends Actor {
 			 if(state < JUMPING)state = IDLE;
 			speed[0] = 0;
 		}
+
+		if(Gdx.input.isKeyPressed(Input.Keys.UP)){
+			interact_press = true;
+		}
+		else{
+			interact_press = false;
+		}
 		
 		if(Gdx.input.isKeyPressed(Input.Keys.UP) || Gdx.input.isKeyPressed(Input.Keys.DOWN)){
 			if(!pressing_climb){
@@ -440,6 +453,26 @@ public class King extends Actor {
 			wanna_climb = false;
 			pressing_climb = false;
 		}
+		
+		if(Gdx.input.isKeyJustPressed(Input.Keys.C) && grounded && state < JUMPING){
+			state = ATTACKING;
+			sub_state = 0;
+			attack_delta = 0;
+			slash_delta = 0;
+			play_slash = true;
+			speed[0] = 0;
+			if(facing_right){
+				slash_direction = true;
+				slash_position[0] = position[0] +36;
+				slash_position[1] = position[1];
+			}
+			else{
+				slash_direction = false;
+				slash_position[0] = position[0]-36;
+				slash_position[1] = position[1];
+			}
+		}
+		
 		
 		if(Gdx.input.isKeyPressed(Input.Keys.X) && grounded && state < JUMPING){
 			if(!pressing_jump){

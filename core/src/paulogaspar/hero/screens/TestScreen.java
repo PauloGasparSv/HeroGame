@@ -1,6 +1,7 @@
 package paulogaspar.hero.screens;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
@@ -10,9 +11,11 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Vector2;
 
 import paulogaspar.hero.actors.King;
+import paulogaspar.hero.interactive.Chest;
 import paulogaspar.hero.interactive.Sign;
 import paulogaspar.hero.interactive.Structure;
 import paulogaspar.hero.maps.Background;
@@ -63,7 +66,7 @@ public class TestScreen extends Stage implements Screen{
 		platforms = new Platform[3];
 		platforms[0] = new Ground(tileset,-120, -64,16,3,0,null);
 		platforms[1] = new Ground(tileset,1020, -64,16,3,0,null);
-		platforms[2] = new Ground(tileset,1520, 128,4,4,1,null);
+		platforms[2] = new Ground(tileset,1520, 128,5,4,1,null);
 		
 		ladders = new Ladder[1];
 		ladders[0] = new Ladder(tileset, 1560, 126, 4);
@@ -109,9 +112,18 @@ public class TestScreen extends Stage implements Screen{
 		bg_elements[1] = new BackgroundMoss(moss, -40, 396-64*6, 4, "3,4,4,4,4,4,4,4,5,#,3,4,4,4,4,4,4,4,5,#,4,4,9,7,7,7,7,7,8,#,9,7,8,-1,-1,-1,-1,-1,-1,#,5,-1,-1,-1,-1,-1,-1,-1,-1,#,5,-1,-1,-1,-1,-1,-1,-1,-1,#,5,-1,-1,-1,-1,-1,-1,-1,-1,#,5,-1,-1,-1,-1,-1,-1,-1,-1,#,11,2,-1,-1,-1,-1,-1,-1,-1,#,4,5,-1,-1,-1,-1,-1,-1,-1,#");		
 		bg_elements[2] = new BackgroundMoss(moss, -48, 400+64*4, 4, "3,4,4,4,4,4,4,4,5,#,3,4,4,4,4,4,4,4,5,#");		
 
-		structs = new Structure[1];
-		structs[0] = new Sign(new TextureRegion(tileset,112+7*16,16,16,16),1060,128,4,"To  the  Town",font);
 		
+		TextureRegion[]chest_region = new TextureRegion[3];
+		chest_region[0] = new TextureRegion(tileset,112+16*7,16*4,16,16);
+		chest_region[1] = new TextureRegion(tileset,112+16*8,16*4,16,16);
+		chest_region[2] = new TextureRegion(tileset,112+16*9,16*4,16,16);
+
+		
+		structs = new Structure[3];
+		structs[0] = new Sign(new TextureRegion(tileset,112+7*16,16,16,16),1060,128,4,"To  the  Town",font);
+		structs[1] = new Chest(chest_region, 1680, 128+64*4, 4);
+		structs[2] = new Sign(new TextureRegion(tileset,112+7*16,0,16,16),1740,128+64*4,4,"I  am  way  too  lazy  to  finish  this  chest",font);
+
 		
 		initController();			
 
@@ -126,15 +138,20 @@ public class TestScreen extends Stage implements Screen{
 	@Override
 	public void init(){
 		next_stage = false;
-		king.position[0] = 300;
+		king.position[0] = 1400;
 		king.position[1] = 300;
-		camera.translate(0, 0);
+		camera.translate(1000, 0);
 	}
 
 	@Override
 	public void update(float delta){
 		
 		if(gamepad!=null && gamepad.getButton(8)){
+			dispose();
+			next_stage = true;
+			Gdx.app.exit();
+		}
+		if(gamepad==null && Gdx.input.isKeyJustPressed(Input.Keys.F4)){
 			dispose();
 			next_stage = true;
 			Gdx.app.exit();
@@ -211,16 +228,16 @@ public class TestScreen extends Stage implements Screen{
 		
 		batch.end();
 		
-		s.setProjectionMatrix(camera.combined);
+		/*s.setProjectionMatrix(camera.combined);
 		
-		/*
+		
 		Gdx.gl.glEnable(GL20.GL_BLEND);
 		Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
 		
 		s.begin(ShapeType.Filled);
 		
 		s.setColor(new Color(1,0,0,0.5f));
-		s.rect(king.rect().x,king.rect().y,king.rect().width,king.rect().height);
+		s.rect(king.atkRect().x,king.atkRect().y,king.atkRect().width,king.atkRect().height);
 		
 		s.end();
 		Gdx.gl.glDisable(GL20.GL_BLEND);
@@ -244,6 +261,7 @@ public class TestScreen extends Stage implements Screen{
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		Gdx.graphics.setTitle("Hero FPS: "+Gdx.graphics.getFramesPerSecond());
 
+		if(next_stage)return;
 		update(delta);
 		if(next_stage)return;
 		draw();
