@@ -12,6 +12,7 @@ public class Chest extends Structure{
 	private int state;
 	
 	private float scale;
+	
 	private long timer;
 	
 	private TextureRegion closed_region;
@@ -19,11 +20,13 @@ public class Chest extends Structure{
 	private TextureRegion open_region;
 	
 	public Chest(TextureRegion[] region,float x,float y,float scale){
-		this.current_frame = region[0];
 		
 		closed_region = region[0];
 		item_region = region[2];
 		open_region = region[1];
+		
+		this.current_frame = closed_region;
+
 		
 		rect = new Rectangle(x,y,region[0].getRegionWidth()*scale,region[0].getRegionHeight()*scale);
 		this.scale = scale;
@@ -52,8 +55,12 @@ public class Chest extends Structure{
 			if(king.state == king.ATTACKING&& state == 0 &&  rect.overlaps(king.atkRect())){
 				state = 1;
 				current_frame = item_region;
+				timer = System.currentTimeMillis();
 			}
 			
+			if(state == 1 && System.currentTimeMillis() - timer > 500){
+				current_frame = open_region;
+			}
 			
 		}
 		

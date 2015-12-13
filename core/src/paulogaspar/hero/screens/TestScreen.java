@@ -11,7 +11,6 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Vector2;
 
 import paulogaspar.hero.actors.King;
@@ -138,9 +137,9 @@ public class TestScreen extends Stage implements Screen{
 	@Override
 	public void init(){
 		next_stage = false;
-		king.position[0] = 1400;
+		king.position[0] = 200;
 		king.position[1] = 300;
-		camera.translate(1000, 0);
+		camera.translate(0, 0);
 	}
 
 	@Override
