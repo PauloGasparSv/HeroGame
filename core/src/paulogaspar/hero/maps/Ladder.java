@@ -13,11 +13,13 @@ public class Ladder {
 	private TextureRegion[] regions;
 	private Rectangle rect;
 	private int height;
-	boolean active;
-	boolean holding_player;
+	public boolean active;
+	public boolean holding_player;
+	private float scale;
 	
 	public Ladder(Texture txt, float x, float y,int height){
-		rect = new Rectangle(x,y,64,height*64);
+		scale = 4.4f;
+		rect = new Rectangle(x,y,16*scale,height*16*scale);
 		
 		active = false;
 		this.height = height;
@@ -61,11 +63,11 @@ public class Ladder {
 	
 	public void draw(SpriteBatch batch){
 		if(active){
-			batch.draw(regions[0],rect.x,rect.y,0,0,16,16,4,4,0);
+			batch.draw(regions[0],rect.x,rect.y,0,0,16,16,scale,scale,0);
 			for(int i = 1; i < height-1; i++){
-				batch.draw(regions[1],rect.x,rect.y+64*i,0,0,16,16,4,4,0);	
+				batch.draw(regions[1],rect.x,rect.y+16*scale*i,0,0,16,16,scale,scale,0);	
 			}
-			batch.draw(regions[2],rect.x,rect.y+64*(height-1),0,0,16,16,4,4,0);
+			batch.draw(regions[2],rect.x,rect.y+16*scale*(height-1),0,0,16,16,scale,scale,0);
 		}
 	}
 	

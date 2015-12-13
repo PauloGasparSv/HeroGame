@@ -25,12 +25,22 @@ public class Ground extends Platform{
 		number_of_tiles[1] = h;
 		
 		tiles = new TextureRegion[6];
-		tiles[0] =  new TextureRegion(sheet,112+16,0,16,16);
-		tiles[1] =  new TextureRegion(sheet,112,16,16,16);
-		tiles[2] = new TextureRegion(sheet,112+16,16,16,16);
-		tiles[3] = new TextureRegion(sheet,112+32,16,16,16);
-		tiles[4] = new TextureRegion(sheet,112+48,16,16,16);
-		tiles[5] = new TextureRegion(sheet,112+80,16,16,16);
+		if(type == 0){
+			tiles[0] =  new TextureRegion(sheet,112+16,0,16,16);
+			tiles[1] =  new TextureRegion(sheet,112,16,16,16);
+			tiles[2] = new TextureRegion(sheet,112+16,16,16,16);
+			tiles[3] = new TextureRegion(sheet,112+32,16,16,16);
+			tiles[4] = new TextureRegion(sheet,112+48,16,16,16);
+			tiles[5] = new TextureRegion(sheet,112+80,16,16,16);
+		}
+		if(type == 1){
+			tiles[0] =  new TextureRegion(sheet,112+16,32,16,16);
+			tiles[1] =  new TextureRegion(sheet,112,32+16,16,16);
+			tiles[2] = new TextureRegion(sheet,112+16,32+16,16,16);
+			tiles[3] = new TextureRegion(sheet,112+32,32+16,16,16);
+			tiles[4] = new TextureRegion(sheet,112+48,32+16,16,16);
+			tiles[5] = new TextureRegion(sheet,112+80,32+16,16,16);
+		}
 		
 		if(style == null){
 			map = new int [number_of_tiles[1]][number_of_tiles[0]];

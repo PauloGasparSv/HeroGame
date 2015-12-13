@@ -5,7 +5,7 @@ import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
 import paulogaspar.hero.core.MyGame;
 
 public class DesktopLauncher {
-	public static void main (String[] arg) {
+	public static void main (String[] arg) {	
 		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
 		
 		config.useGL30 = false;

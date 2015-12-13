@@ -15,7 +15,7 @@ public class Background{
 	private float scale;
 	private float speed;
 	
-	public Background(TextureRegion region,int x,int y,float scale,float speed){
+	public Background(TextureRegion region,float x,float y,float scale,float speed){
 		this.region = region;
 		position = new float[2];
 		position[0] = x;
