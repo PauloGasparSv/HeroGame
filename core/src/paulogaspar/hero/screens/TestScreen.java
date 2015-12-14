@@ -14,6 +14,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 
 import paulogaspar.hero.actors.King;
+import paulogaspar.hero.actors.SheepLord;
 import paulogaspar.hero.interactive.Chest;
 import paulogaspar.hero.interactive.Sign;
 import paulogaspar.hero.interactive.Structure;
@@ -30,6 +31,7 @@ public class TestScreen extends Stage implements Screen{
 	
 	private Texture tileset;
 	private Texture []layers;
+	private Texture sheep_lord;
 	
 	private BitmapFont font;
 	
@@ -38,6 +40,8 @@ public class TestScreen extends Stage implements Screen{
 	private Background [] bg;
 	private Background [] images;
 	private Structure [] structs;
+	
+	private SheepLord lord;
 	
 	private Ladder[] ladders;
 	
@@ -54,6 +58,8 @@ public class TestScreen extends Stage implements Screen{
 		
 		//X: 112 W: 60
 		//48x128
+		
+		sheep_lord = new Texture(Gdx.files.internal("PixelSheep.png"));
 		
 		layers = new Texture[3];
 		layers[0] = new Texture(Gdx.files.internal("layers/parallax-forest-back-trees.png"));
@@ -86,8 +92,6 @@ public class TestScreen extends Stage implements Screen{
 		images[4] = new Background(new TextureRegion(tileset,112+9*16,16*6,16,16), 805, 128, 3f,1);
 		images[5] = new Background(new TextureRegion(tileset,112+9*16,16*5,16,16), 768, 128, 3f,1);
 		images[6] = new Background(new TextureRegion(tileset,112+8*16,16*5,16,16), 138, 128, 3f,1);
-
-
 		
 		TextureRegion [] moss = new TextureRegion[15];
 		moss[0] = new TextureRegion(tileset,112+16*4,16*4,16,16);
@@ -127,6 +131,13 @@ public class TestScreen extends Stage implements Screen{
 		initController();			
 
 		king = new King(gamepad,camera);
+		
+		String []messages = {"Hello  there  buddy","It is  I !!!!","","I  said  it  is  me!","Praise  me  now !!!","","Come  on  dude  it  is  me  you  know",
+				"GOD  the  all  powerfull","Yes  I  am  God  and  yes  this  is  a  sheep","Why  a  sheep  you  probably  ask  yourself", "Well  fuck  you  that  is  why",
+				"You  big  sheep  racist !","But  worry  not  as  i  am  the  one  who  created  you","So  I  already  knew", "After  all  I  hate  sheeps  myself",""};
+		
+		lord = new SheepLord(new TextureRegion(sheep_lord),font,camera,king,messages,1300,140);
+
 		
 		
 		s = new ShapeRenderer();
@@ -189,6 +200,7 @@ public class TestScreen extends Stage implements Screen{
 		for(BackgroundElement e:bg_elements)e.update(camera);
 		for(Ladder l:ladders)l.update(camera, king);
 		for(Structure s:structs)s.update(camera, king);
+		lord.update(delta);
 		
 		if(king.position[1] < -100){
 			king.init();
@@ -221,6 +233,8 @@ public class TestScreen extends Stage implements Screen{
 		for(Ladder l:ladders)l.draw(batch);
 		for(Structure s:structs)s.draw(batch);
 		
+		lord.draw(batch);
+		
 		king.draw(batch);
 		
 
@@ -236,12 +250,12 @@ public class TestScreen extends Stage implements Screen{
 		s.begin(ShapeType.Filled);
 		
 		s.setColor(new Color(1,0,0,0.5f));
-		s.rect(king.atkRect().x,king.atkRect().y,king.atkRect().width,king.atkRect().height);
+		s.rect(lord.rect().x,lord.rect().y,lord.rect().width,lord.rect().height);
 		
 		s.end();
-		Gdx.gl.glDisable(GL20.GL_BLEND);
+		Gdx.gl.glDisable(GL20.GL_BLEND);*/
 
-		*/
+		
 		
 	}
 	
@@ -250,6 +264,7 @@ public class TestScreen extends Stage implements Screen{
 		for(Texture l:layers)l.dispose();
 		font.dispose();
 		tileset.dispose();
+		sheep_lord.dispose();
 		king.dispose();
 		batch.dispose();
 	}
